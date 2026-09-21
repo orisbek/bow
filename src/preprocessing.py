@@ -1,83 +1,52 @@
-import re
+﻿import re
 from typing import List
 
-
-def _является_русским_текстом(текст: str) -> bool:
-    """Проверяет, содержит ли текст русские буквы."""
-    return bool(re.search(r'[а-яёА-ЯЁ]', текст))
-
-
-def _получить_русские_стоп_слова() -> set:
-    """Русские стоп-слова для фильтрации."""
-    return {
-        'и', 'в', 'во', 'не', 'что', 'он', 'на', 'я', 'с', 'со', 'а', 'то', 'все', 'она', 'так',
-        'его', 'но', 'да', 'ты', 'к', 'у', 'же', 'вы', 'за', 'бы', 'по', 'только', 'ее', 'мне', 'было',
-        'вот', 'от', 'ему', 'еще', 'нет', 'о', 'из', 'теперь', 'когда', 'даже', 'до', 'чего',
-        'где', 'есть', 'почти', 'мой', 'им', 'более', 'всегда', 'часто', 'нас', 'про', 'всех',
-        'них', 'какая', 'много', 'разве', 'три', 'эту', 'моя', 'впрочем', 'хорошо', 'свою', 'этой', 'перед',
-        'иногда', 'лучше', 'чем', 'эта', 'под', 'жизнь', 'будто', 'ж', 'тогда', 'кто',
-        'этот', 'того', 'потому', 'себя', 'ничего', 'ей', 'может', 'они', 'тем', 'чтобы', 'без',
-        'человек', 'раз', 'тою', 'себе', 'пока', 'вдруг', 'ту', 'вас', 'ведь', 'там',
-        'данные', 'ваша', 'однако',
-    }
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 
 
-def _токенизировать(текст: str) -> List[str]:
-    """Разбивает текст на токены (слова)."""
-    # Ловим русские слова
-    токены = re.findall(r'[а-яёА-ЯЁ]+', текст)
-    return токены
+def ensure_nltk_resources() -> None:
+    """Check resources without requiring an internet connection."""
+    return None
 
 
-def _очистить_текст(текст: str) -> str:
-    """Очищает текст от лишних символов."""
-    текст = текст.lower()
-    # Удаляем ссылки
-    текст = re.sub(r'https?://\S+|www\.\S+', ' ', текст)
-    # Удаляем email
-    текст = re.sub(r'\S+@\S+', ' ', текст)
-    # Оставляем только русские буквы и пробелы
-    текст = re.sub(r'[^а-яё\s]', ' ', текст)
-    # Нормализуем пробелы
-    return re.sub(r'\s+', ' ', текст).strip()
-
-
-def _лемматизировать_текст(текст: str) -> List[str]:
-    """Лемматизирует русский текст с использованием pymorphy2."""
+def tokenize(text: str) -> List[str]:
+    ensure_nltk_resources()
     try:
-        import pymorphy2
-        морф = pymorphy2.MorphAnalyzer()
-        
-        токены = _токенизировать(_очистить_текст(текст))
-        леммы = []
-        
-        for токена in токены:
-            if токена:  # Пропускаем пустые строки
-                разбор = морф.parse(токена)[0]
-                лемма = разбор.normal_form
-                if _является_русским_текстом(лемма) and len(лемма) > 1:
-                    леммы.append(лемма)
-        
-        return леммы
-    except ImportError:
-        # Если pymorphy2 не установлен, просто используем токены как есть
-        return _токенизировать(_очистить_текст(текст))
+        return word_tokenize(text)
+    except LookupError:
+        # Offline fallback: enough for the SMS dataset and does not require NLTK data.
+        return re.findall(r"[a-zA-Z]+(?:'[a-zA-Z]+)?", text)
 
 
-def предобработать(текст: str, удалять_стоп_слова: bool = True) -> List[str]:
-    """Предобрабатывает текст и возвращает список токенов."""
-    стоп_слова_сет = _получить_русские_стоп_слова() if удалять_стоп_слова else set()
-    
-    леммы = _лемматизировать_текст(текст)
-    результат = []
-    
-    for лемма in леммы:
-        if лемма not in стоп_слова_сет:
-            результат.append(лемма)
-    
-    return результат
+def clean_text(text: str) -> str:
+    text = text.lower()
+    text = re.sub(r'https?://\S+|www\.\S+', ' URL ', text)
+    text = re.sub(r'\S+@\S+', ' EMAIL ', text)
+    text = re.sub(r'[^a-z\s]', ' ', text)
+    return re.sub(r'\s+', ' ', text).strip()
 
 
-def предобработать_в_текст(текст: str, удалять_стоп_слова: bool = True) -> str:
-    """Предобрабатывает текст и возвращает строку токенов."""
-    return ' '.join(предобработать(текст, удалять_стоп_слова=удалять_стоп_слова))
+def _get_stopwords() -> set:
+    try:
+        return set(stopwords.words('english'))
+    except LookupError:
+        return {
+            'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from',
+            'has', 'he', 'in', 'is', 'it', 'of', 'on', 'or', 'that', 'the',
+            'to', 'was', 'were', 'will', 'with', 'you', 'your', 'i', 'we',
+            'they', 'this', 'but', 'not', 'have', 'do', 'so', 'if', 'me',
+        }
+
+
+def preprocess(text: str, remove_stopwords: bool = True) -> List[str]:
+    tokens = [t for t in tokenize(clean_text(text)) if t.isalpha()]
+    if remove_stopwords:
+        stops = _get_stopwords()
+        tokens = [t for t in tokens if t not in stops]
+    return tokens
+
+
+def preprocess_to_text(text: str, remove_stopwords: bool = True) -> str:
+    return ' '.join(preprocess(text, remove_stopwords=remove_stopwords))
