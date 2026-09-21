@@ -1,149 +1,134 @@
-from pathlib import Path
+﻿from pathlib import Path
 import sys
-
-# Добавляем корневую папку в путь Python
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from src.data import загрузить_данные_смс
-from src.preprocessing import предобработать_в_текст
-from src.vectorization import преобразовать_обучение_тест
+from src.data import load_sms_data
+from src.preprocessing import preprocess_to_text
+from src.vectorization import fit_transform_train_test
 
-КОРЕНЬ = Path(__file__).resolve().parents[1]
-ОТЧЕТЫ = КОРЕНЬ / 'reports'
-ИЗОБРАЖЕНИЯ = КОРЕНЬ / 'outputs' / 'images'
-ОТЧЕТЫ.mkdir(exist_ok=True)
-ИЗОБРАЖЕНИЯ.mkdir(parents=True, exist_ok=True)
+ROOT = Path(__file__).resolve().parents[1]
+REPORTS = ROOT / 'reports'
+IMAGES = ROOT / 'outputs' / 'images'
+REPORTS.mkdir(exist_ok=True)
+IMAGES.mkdir(parents=True, exist_ok=True)
 
 
-def сохранить_график_топ_терминов(мешок_слов_термины: pd.DataFrame, тф_идф_термины: pd.DataFrame) -> None:
-    """Сохраняет график топ 20 терминов для BOW и TF-IDF."""
+def save_top_terms_plot(bow_terms: pd.DataFrame, tfidf_terms: pd.DataFrame) -> None:
     fig, axes = plt.subplots(1, 2, figsize=(16, 7))
 
-    граф_мешок = мешок_слов_термины.sort_values('вес').tail(20)
-    axes[0].barh(граф_мешок['термин'], граф_мешок['вес'])
-    axes[0].set_title('Мешок слов: топ-20 по суммарной частоте')
-    axes[0].set_xlabel('Количество вхождений')
+    bow_plot = bow_terms.sort_values('weight').tail(20)
+    axes[0].barh(bow_plot['term'], bow_plot['weight'])
+    axes[0].set_title('BOW: ╤é╨╛╨┐-20 ╨┐╨╛ ╤ü╤â╨╝╨╝╨░╤Ç╨╜╨╛╨╣ ╤ç╨░╤ü╤é╨╛╤é╨╡')
+    axes[0].set_xlabel('╨Ü╨╛╨╗╨╕╤ç╨╡╤ü╤é╨▓╨╛ ╨▓╤à╨╛╨╢╨┤╨╡╨╜╨╕╨╣')
     axes[0].grid(axis='x', alpha=0.35)
     axes[0].set_axisbelow(True)
 
-    граф_тф_идф = тф_идф_термины.sort_values('вес').tail(20)
-    axes[1].barh(граф_тф_идф['термин'], граф_тф_идф['вес'])
-    axes[1].set_title('TF-IDF: топ-20 по среднему весу')
-    axes[1].set_xlabel('Средний TF-IDF')
+    tfidf_plot = tfidf_terms.sort_values('weight').tail(20)
+    axes[1].barh(tfidf_plot['term'], tfidf_plot['weight'])
+    axes[1].set_title('TF-IDF: ╤é╨╛╨┐-20 ╨┐╨╛ ╤ü╤Ç╨╡╨┤╨╜╨╡╨╝╤â ╨▓╨╡╤ü╤â')
+    axes[1].set_xlabel('╨í╤Ç╨╡╨┤╨╜╨╕╨╣ TF-IDF')
     axes[1].grid(axis='x', alpha=0.35)
     axes[1].set_axisbelow(True)
 
     fig.tight_layout()
-    fig.savefig(ИЗОБРАЖЕНИЯ / 'неделя4_мешок_слов_тф_идф_топ20.png', dpi=220, bbox_inches='tight')
+    fig.savefig(IMAGES / 'week4_bow_tfidf_top20.png', dpi=220, bbox_inches='tight')
     plt.close(fig)
 
 
-def сохранить_облака_слов(мешок_слов_термины: pd.DataFrame, тф_идф_термины: pd.DataFrame) -> None:
-    """Сохраняет облака слов для BOW и TF-IDF."""
+def save_wordclouds(bow_terms: pd.DataFrame, tfidf_terms: pd.DataFrame) -> None:
     try:
         from wordcloud import WordCloud
     except ImportError:
-        (ОТЧЕТЫ / 'облако_слов_статус.txt').write_text(
-            'Пакет wordcloud не установлен. Выполните: pip install wordcloud',
+        (REPORTS / 'wordcloud_status.txt').write_text(
+            '╨ƒ╨░╨║╨╡╤é wordcloud ╨╜╨╡ ╤â╤ü╤é╨░╨╜╨╛╨▓╨╗╨╡╨╜. ╨Æ╤ï╨┐╨╛╨╗╨╜╨╕╤é╨╡: pip install wordcloud',
             encoding='utf-8',
         )
         return
 
-    for название, термины, имя_файла, заголовок in [
-        ('Мешок слов', мешок_слов_термины, 'неделя4_мешок_слов_облако.png', 'Облако слов (Мешок слов)'),
-        ('TF-IDF', тф_идф_термины, 'неделя4_тф_идф_облако.png', 'Облако слов (TF-IDF)'),
+    for name, terms, filename, title in [
+        ('BOW', bow_terms, 'week4_bow_wordcloud.png', '╨₧╨▒╨╗╨░╨║╨╛ ╤ü╨╗╨╛╨▓ BOW'),
+        ('TF-IDF', tfidf_terms, 'week4_tfidf_wordcloud.png', '╨₧╨▒╨╗╨░╨║╨╛ ╤ü╨╗╨╛╨▓ TF-IDF'),
     ]:
-        частоты = dict(zip(термины['термин'], термины['вес']))
-        облако = WordCloud(
+        frequencies = dict(zip(terms['term'], terms['weight']))
+        cloud = WordCloud(
             width=1500,
             height=650,
             background_color='white',
-            colormap='viridis' if название == 'Мешок слов' else 'autumn',
+            colormap='viridis' if name == 'BOW' else 'autumn',
             max_words=100,
             collocations=False,
             random_state=42,
-        ).generate_from_frequencies(частоты)
+        ).generate_from_frequencies(frequencies)
 
         plt.figure(figsize=(16, 7))
-        plt.imshow(облако, interpolation='bilinear')
+        plt.imshow(cloud, interpolation='bilinear')
         plt.axis('off')
-        plt.title(заголовок)
+        plt.title(title)
         plt.tight_layout(pad=0)
-        plt.savefig(ИЗОБРАЖЕНИЯ / имя_файла, dpi=220, bbox_inches='tight')
+        plt.savefig(IMAGES / filename, dpi=220, bbox_inches='tight')
         plt.close()
 
 
-# Загружаем и обрабатываем данные
-df = загрузить_данные_смс()
-df['обработанный_текст'] = df.сообщение.map(предобработать_в_текст)
-
-# Разделяем на тренировочную и тестовую выборки
-обучение, тест = train_test_split(
+df = load_sms_data()
+df['processed_text'] = df.message.map(preprocess_to_text)
+train, test = train_test_split(
     df,
     test_size=0.2,
     random_state=42,
-    stratify=df.метка,
+    stratify=df.label,
 )
+vecs = fit_transform_train_test(train.processed_text, test.processed_text)
+rows = []
+bow_terms = None
+tfidf_terms = None
 
-# Преобразуем в векторы
-векторы = преобразовать_обучение_тест(обучение.обработанный_текст, тест.обработанный_текст)
-строки = []
-мешок_слов_термины = None
-тф_идф_термины = None
-
-# Анализируем каждое представление
-for название, (векторизатор, X_обучение, X_тест) in векторы.items():
-    строки.append({
-        'представление': название,
-        'строк_обучение': X_обучение.shape[0],
-        'строк_тест': X_тест.shape[0],
-        'признаки': X_обучение.shape[1],
-        'ненулевые_обучение': int(X_обучение.nnz),
-        'ненулевые_тест': int(X_тест.nnz),
+for name, (vectorizer, X_train, X_test) in vecs.items():
+    rows.append({
+        'representation': name,
+        'train_rows': X_train.shape[0],
+        'test_rows': X_test.shape[0],
+        'features': X_train.shape[1],
+        'train_nonzero': int(X_train.nnz),
+        'test_nonzero': int(X_test.nnz),
     })
-    
-    термины = векторизатор.get_feature_names_out()
-    if название == 'мешок_слов':
-        веса = X_обучение.sum(axis=0).A1
+    terms = vectorizer.get_feature_names_out()
+    if name == 'bow':
+        weights = X_train.sum(axis=0).A1
     else:
-        веса = X_обучение.mean(axis=0).A1
+        weights = X_train.mean(axis=0).A1
 
-    топ = (
-        pd.DataFrame({'термин': термины, 'вес': веса})
-        .sort_values('вес', ascending=False)
+    top = (
+        pd.DataFrame({'term': terms, 'weight': weights})
+        .sort_values('weight', ascending=False)
         .head(100)
         .reset_index(drop=True)
     )
-    топ.to_csv(ОТЧЕТЫ / f'неделя4_топ100_{название}.csv', index=False)
+    top.to_csv(REPORTS / f'week4_top100_{name}.csv', index=False)
 
-    if название == 'мешок_слов':
-        мешок_слов_термины = топ
+    if name == 'bow':
+        bow_terms = top
     else:
-        тф_идф_термины = топ
+        tfidf_terms = top
 
-# Сохраняем результаты сравнения матриц
-pd.DataFrame(строки).to_csv(ОТЧЕТЫ / 'неделя4_сравнение_матриц.csv', index=False)
+pd.DataFrame(rows).to_csv(REPORTS / 'week4_matrix_comparison.csv', index=False)
 
-# Сохраняем графики и облака слов
-if мешок_слов_термины is not None and тф_идф_термины is not None:
-    сохранить_график_топ_терминов(мешок_слов_термины, тф_идф_термины)
-    сохранить_облака_слов(мешок_слов_термины, тф_идф_термины)
+if bow_terms is not None and tfidf_terms is not None:
+    save_top_terms_plot(bow_terms, tfidf_terms)
+    save_wordclouds(bow_terms, tfidf_terms)
 
-# Сохраняем обработанный датасет
-df[['метка', 'сообщение', 'обработанный_текст']].to_csv(
-    ОТЧЕТЫ / 'неделя4_обработанный_датасет.csv', index=False
+df[['label', 'message', 'processed_text']].to_csv(
+    REPORTS / 'week4_processed_dataset.csv', index=False
 )
-обучение[['метка', 'сообщение', 'обработанный_текст']].to_csv(
-    ОТЧЕТЫ / 'неделя4_обучение.csv', index=False
+train[['label', 'message', 'processed_text']].to_csv(
+    REPORTS / 'week4_train.csv', index=False
 )
-тест[['метка', 'сообщение', 'обработанный_текст']].to_csv(
-    ОТЧЕТЫ / 'неделя4_тест.csv', index=False
+test[['label', 'message', 'processed_text']].to_csv(
+    REPORTS / 'week4_test.csv', index=False
 )
 
-# Выводим результаты
-print(pd.DataFrame(строки).to_string(index=False))
-print(f'Изображения сохранены в: {ИЗОБРАЖЕНИЯ}')
+print(pd.DataFrame(rows).to_string(index=False))
+print(f'╨ÿ╨╖╨╛╨▒╤Ç╨░╨╢╨╡╨╜╨╕╤Å ╤ü╨╛╤à╤Ç╨░╨╜╨╡╨╜╤ï ╨▓: {IMAGES}')
