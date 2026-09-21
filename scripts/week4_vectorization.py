@@ -118,7 +118,6 @@ if bow_terms is not None and tfidf_terms is not None:
     save_top_terms_plot(bow_terms, tfidf_terms)
     save_wordclouds(bow_terms, tfidf_terms)
 
-# Дополнительные CSV-файлы для дальнейшего анализа и воспроизводимости.
 df[['label', 'message', 'processed_text']].to_csv(
     REPORTS / 'week4_processed_dataset.csv', index=False
 )
