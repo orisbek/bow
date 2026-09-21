@@ -1,30 +1,55 @@
 from collections import Counter
-from typing import Iterable
+from typing import Iterable, List
 
-import nltk
-from nltk.stem import PorterStemmer, SnowballStemmer
-
-from .preprocessing import ensure_nltk_resources, preprocess
+from .preprocessing import предобработать
 
 
-def stems(tokens: Iterable[str]):
-    porter, snowball = PorterStemmer(), SnowballStemmer('english')
-    return [porter.stem(t) for t in tokens], [snowball.stem(t) for t in tokens]
-
-
-def spacy_lemmas(texts: Iterable[str]):
+def _получить_лемматизатор():
+    """Инициализирует лемматизатор pymorphy2 для русского языка."""
     try:
-        import spacy
-        try:
-            nlp = spacy.load('en_core_web_sm', disable=['ner', 'parser'])
-        except OSError:
-            return None, 'spaCy model en_core_web_sm is not installed'
-        docs = nlp.pipe(texts)
-        return [[tok.lemma_ for tok in doc if tok.is_alpha] for doc in docs], None
+        import pymorphy2
+        return pymorphy2.MorphAnalyzer()
     except ImportError:
-        return None, 'spaCy is not installed'
+        return None
 
 
-def top_tokens(df, n=50):
-    counter = Counter(token for text in df['message'] for token in preprocess(text))
-    return counter.most_common(n)
+def основные_формы(тексты: Iterable[str]) -> List[List[str]]:
+    """Получает основные формы слов (леммы) для русских текстов.
+    
+    Args:
+        тексты: Итерируемое значение текстов
+        
+    Returns:
+        Список списков лемм
+    """
+    морф = _получить_лемматизатор()
+    if морф is None:
+        return None, 'pymorphy2 не установлен'
+    
+    результаты = []
+    for текст in тексты:
+        леммы = []
+        токены = предобработать(текст, удалять_стоп_слова=False)
+        for токена in токены:
+            разбор = морф.parse(токена)[0]
+            леммы.append(разбор.normal_form)
+        результаты.append(леммы)
+    
+    return результаты, None
+
+
+def топ_токены(df, n=50):
+    """Получает топ N токенов из датасета.
+    
+    Args:
+        df: DataFrame с колонкой 'сообщение'
+        n: Количество топ токенов
+        
+    Returns:
+        Список кортежей (токен, частота)
+    """
+    счетчик = Counter(
+        токен for текст in df['сообщение'] 
+        for токен in предобработать(текст)
+    )
+    return счетчик.most_common(n)

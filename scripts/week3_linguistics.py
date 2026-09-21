@@ -1,28 +1,34 @@
 from pathlib import Path
+import sys
+
+# Добавляем корневую папку в путь Python
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 import pandas as pd
 from collections import Counter
-from src.data import load_sms_data
-from src.preprocessing import preprocess
-from src.linguistics import stems, spacy_lemmas
+from src.data import загрузить_данные_смс
+from src.preprocessing import предобработать
+from src.linguistics import основные_формы
 
-ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / 'reports'; OUT.mkdir(exist_ok=True)
-df = load_sms_data()
-rows = []
-for text in df.message.head(300):
-    tokens = preprocess(text)
-    porter, snowball = stems(tokens)
-    rows.append({'text': text, 'tokens': ' '.join(tokens), 'porter': ' '.join(porter), 'snowball': ' '.join(snowball)})
-pd.DataFrame(rows).to_csv(OUT / 'week3_stemming_examples.csv', index=False)
-lemmas, error = spacy_lemmas(df.message.head(300))
-if lemmas is not None:
-    pd.DataFrame({'message': df.message.head(300), 'lemmas': [' '.join(x) for x in lemmas]}).to_csv(OUT / 'week3_spacy_lemmas.csv', index=False)
+КОРЕНЬ = Path(__file__).resolve().parents[1]
+ОТЧЕТЫ = КОРЕНЬ / 'reports'
+ОТЧЕТЫ.mkdir(exist_ok=True)
+
+df = загрузить_данные_смс()
+строки = []
+
+# Примеры лемматизации
+леммы, ошибка = основные_формы(df.сообщение.head(300))
+if леммы is not None:
+    pd.DataFrame({
+        'сообщение': df.сообщение.head(300),
+        'леммы': [' '.join(x) for x in леммы]
+    }).to_csv(ОТЧЕТЫ / 'неделя3_леммы.csv', index=False)
 else:
-    (OUT / 'week3_spacy_status.txt').write_text(error, encoding='utf-8')
+    (ОТЧЕТЫ / 'неделя3_статус.txt').write_text(ошибка, encoding='utf-8')
 
-tokens = [t for text in df.message for t in preprocess(text)]
-porter, snowball = stems(tokens)
-pd.DataFrame(Counter(tokens).most_common(50), columns=['term','count']).to_csv(OUT / 'week3_top50_tokens.csv', index=False)
-pd.DataFrame(Counter(porter).most_common(50), columns=['term','count']).to_csv(OUT / 'week3_top50_porter.csv', index=False)
-pd.DataFrame(Counter(snowball).most_common(50), columns=['term','count']).to_csv(OUT / 'week3_top50_snowball.csv', index=False)
-print('Week 3 outputs written to reports/')
+# Анализ частотности токенов
+токены = [т for текст in df.сообщение for т in предобработать(текст)]
+pd.DataFrame(Counter(токены).most_common(50), columns=['термин','кол_во']).to_csv(ОТЧЕТЫ / 'неделя3_топ50_токены.csv', index=False)
+
+print('Отчеты недели 3 записаны в папку reports/')

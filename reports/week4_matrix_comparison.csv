@@ -1,3 +1,0 @@
-representation,train_rows,test_rows,features,train_nonzero,test_nonzero
-bow,4457,1115,6640,35834,8286
-tfidf,4457,1115,6640,35834,8286
