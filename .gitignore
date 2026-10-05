@@ -1,0 +1,32 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Generated artifacts
+artifacts/
+
+# Data
+data/
+
+# Trained models
+models/
+
+# Generated outputs
+outputs/
+
+# Reports
+reports/
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/

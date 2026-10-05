@@ -1,41 +1,60 @@
-# Spam Detector — учебный проект (недели 1–4)
+# Spam Detector — учебный NLP-проект (недели 1–5)
 
-Проект анализирует датасет `data/SMSSpamCollection` и готовит данные для классификации SMS-сообщений на `spam` и `ham`.
+Проект анализирует датасет `data/SMSSpamCollection` и постепенно готовит его к классификации SMS на `spam` и `ham`.
 
-## Что формируется после запуска
+## Неделя 5 — Word2Vec, GloVe, fastText
 
-После выполнения `python main.py` проект создаёт:
+В Week 5 реализованы все задачи из плана:
 
-- CSV-таблицы с результатами анализа в папке `reports/`;
-- PNG-фотографии графиков и облаков слов в папке `outputs/images/`;
-- отдельные CSV-файлы с обработанным датасетом, train/test-выборками и характеристиками матриц.
+- обучение собственной модели **Word2Vec** с помощью Gensim;
+- поиск ближайших слов по cosine similarity;
+- арифметика векторов;
+- собственная компактная реализация **GloVe** на разреженной матрице совместной встречаемости;
+- обучение **fastText** через Gensim с символьными n-граммами;
+- сравнение Word2Vec, GloVe и fastText на одинаковом корпусе и размерности векторов;
+- сохранение моделей, CSV-отчётов и PNG-визуализаций;
+- семантические примеры для домена SMS.
 
-### Основные изображения
+Важно: сравнение качества в `week5_similarity_pairs.csv` — это **внутренний, доменно-ориентированный proxy-тест**, а не официальный универсальный benchmark. Пары слов заранее заданы как связанные по смыслу термины из SMS-словаря.
 
-- `outputs/images/week1_class_distribution.png` — распределение классов;
-- `outputs/images/week4_bow_tfidf_top20.png` — топ-20 слов BOW и TF-IDF;
-- `outputs/images/week4_bow_wordcloud.png` — облако слов BOW;
-- `outputs/images/week4_tfidf_wordcloud.png` — облако слов TF-IDF.
+## Что создаётся после запуска
 
-### Основные CSV-файлы
+### Модели
 
-- `reports/week1_summary.csv`;
-- `reports/week1_grouped_stats.csv`;
-- `reports/week2_before_after.csv`;
-- `reports/week2_length_comparison.csv`;
-- `reports/week3_stemming_examples.csv`;
-- `reports/week3_spacy_lemmas.csv` — если установлена модель spaCy;
-- `reports/week3_top50_tokens.csv`;
-- `reports/week3_top50_porter.csv`;
-- `reports/week3_top50_snowball.csv`;
-- `reports/week4_top100_bow.csv`;
-- `reports/week4_top100_tfidf.csv`;
-- `reports/week4_matrix_comparison.csv`;
-- `reports/week4_processed_dataset.csv`;
-- `reports/week4_train.csv`;
-- `reports/week4_test.csv`.
+- `models/week5_word2vec.model` — полная модель Word2Vec Gensim;
+- `models/week5_word2vec.kv` — KeyedVectors Word2Vec;
+- `models/week5_fasttext.model` — полная модель fastText Gensim;
+- `models/week5_fasttext.kv` — KeyedVectors fastText;
+- `models/week5_glove.npz` — веса GloVe;
+- `models/week5_glove_vocab.json` — словарь GloVe.
 
-## Установка и запуск
+### CSV
+
+- `reports/week5_vocab_stats.csv` — статистика корпуса;
+- `reports/week5_model_comparison.csv` — размерность, словарь и время обучения;
+- `reports/week5_semantic_neighbors.csv` — ближайшие слова для выбранных anchors;
+- `reports/week5_similarity_pairs.csv` — cosine similarity для семантических пар;
+- `reports/week5_similarity_pairs_long.csv` — та же оценка в long-формате;
+- `reports/week5_vector_arithmetic.csv` — результаты арифметики векторов.
+
+### Изображения
+
+- `outputs/images/week5_model_quality.png` — сравнение средней cosine similarity;
+- `outputs/images/week5_free_neighbors.png` — ближайшие слова к `free` для трёх моделей.
+
+## Параметры Week 5
+
+Для сопоставимости модели обучаются на одном и том же корпусе после общего preprocessing:
+
+- `vector_size = 30`;
+- `window = 4`;
+- `min_count = 2`;
+- `seed = 42`;
+- Word2Vec: skip-gram, 10 epochs;
+- fastText: skip-gram, 10 epochs, character n-grams 3–5;
+- GloVe: окно 4, 10 epochs, weighted co-occurrence, AdaGrad.
+
+## Установка
 
 ```bash
 python -m venv .venv
@@ -59,22 +78,30 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Ресурсы NLTK:
+При необходимости NLTK:
 
 ```bash
 python -m nltk.downloader punkt punkt_tab stopwords
 ```
 
-Модель spaCy (необходима для лемматизации):
+Для Week 3, если нужна spaCy-лемматизация:
 
 ```bash
 python -m spacy download en_core_web_sm
 ```
 
-Запуск всех этапов:
+## Запуск
+
+Все недели:
 
 ```bash
 python main.py
 ```
 
-Все результаты будут созданы автоматически. При повторном запуске CSV и изображения обновляются.
+Только Week 5:
+
+```bash
+python -m scripts.week5_embeddings
+```
+
+После запуска модели, CSV и изображения обновляются автоматически.

@@ -1,6 +1,4 @@
-﻿from pathlib import Path
-import sys
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from pathlib import Path
 import pandas as pd
 from src.data import load_sms_data
 from src.preprocessing import preprocess_to_text

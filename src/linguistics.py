@@ -1,4 +1,4 @@
-﻿from collections import Counter
+from collections import Counter
 from typing import Iterable
 
 import nltk

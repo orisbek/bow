@@ -1,6 +1,4 @@
-﻿from pathlib import Path
-import sys
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -22,15 +20,15 @@ def save_top_terms_plot(bow_terms: pd.DataFrame, tfidf_terms: pd.DataFrame) -> N
 
     bow_plot = bow_terms.sort_values('weight').tail(20)
     axes[0].barh(bow_plot['term'], bow_plot['weight'])
-    axes[0].set_title('BOW: ╤é╨╛╨┐-20 ╨┐╨╛ ╤ü╤â╨╝╨╝╨░╤Ç╨╜╨╛╨╣ ╤ç╨░╤ü╤é╨╛╤é╨╡')
-    axes[0].set_xlabel('╨Ü╨╛╨╗╨╕╤ç╨╡╤ü╤é╨▓╨╛ ╨▓╤à╨╛╨╢╨┤╨╡╨╜╨╕╨╣')
+    axes[0].set_title('BOW: топ-20 по суммарной частоте')
+    axes[0].set_xlabel('Количество вхождений')
     axes[0].grid(axis='x', alpha=0.35)
     axes[0].set_axisbelow(True)
 
     tfidf_plot = tfidf_terms.sort_values('weight').tail(20)
     axes[1].barh(tfidf_plot['term'], tfidf_plot['weight'])
-    axes[1].set_title('TF-IDF: ╤é╨╛╨┐-20 ╨┐╨╛ ╤ü╤Ç╨╡╨┤╨╜╨╡╨╝╤â ╨▓╨╡╤ü╤â')
-    axes[1].set_xlabel('╨í╤Ç╨╡╨┤╨╜╨╕╨╣ TF-IDF')
+    axes[1].set_title('TF-IDF: топ-20 по среднему весу')
+    axes[1].set_xlabel('Средний TF-IDF')
     axes[1].grid(axis='x', alpha=0.35)
     axes[1].set_axisbelow(True)
 
@@ -44,14 +42,14 @@ def save_wordclouds(bow_terms: pd.DataFrame, tfidf_terms: pd.DataFrame) -> None:
         from wordcloud import WordCloud
     except ImportError:
         (REPORTS / 'wordcloud_status.txt').write_text(
-            '╨ƒ╨░╨║╨╡╤é wordcloud ╨╜╨╡ ╤â╤ü╤é╨░╨╜╨╛╨▓╨╗╨╡╨╜. ╨Æ╤ï╨┐╨╛╨╗╨╜╨╕╤é╨╡: pip install wordcloud',
+            'Пакет wordcloud не установлен. Выполните: pip install wordcloud',
             encoding='utf-8',
         )
         return
 
     for name, terms, filename, title in [
-        ('BOW', bow_terms, 'week4_bow_wordcloud.png', '╨₧╨▒╨╗╨░╨║╨╛ ╤ü╨╗╨╛╨▓ BOW'),
-        ('TF-IDF', tfidf_terms, 'week4_tfidf_wordcloud.png', '╨₧╨▒╨╗╨░╨║╨╛ ╤ü╨╗╨╛╨▓ TF-IDF'),
+        ('BOW', bow_terms, 'week4_bow_wordcloud.png', 'Облако слов BOW'),
+        ('TF-IDF', tfidf_terms, 'week4_tfidf_wordcloud.png', 'Облако слов TF-IDF'),
     ]:
         frequencies = dict(zip(terms['term'], terms['weight']))
         cloud = WordCloud(
@@ -120,6 +118,7 @@ if bow_terms is not None and tfidf_terms is not None:
     save_top_terms_plot(bow_terms, tfidf_terms)
     save_wordclouds(bow_terms, tfidf_terms)
 
+# Дополнительные CSV-файлы для дальнейшего анализа и воспроизводимости.
 df[['label', 'message', 'processed_text']].to_csv(
     REPORTS / 'week4_processed_dataset.csv', index=False
 )
@@ -131,4 +130,4 @@ test[['label', 'message', 'processed_text']].to_csv(
 )
 
 print(pd.DataFrame(rows).to_string(index=False))
-print(f'╨ÿ╨╖╨╛╨▒╤Ç╨░╨╢╨╡╨╜╨╕╤Å ╤ü╨╛╤à╤Ç╨░╨╜╨╡╨╜╤ï ╨▓: {IMAGES}')
+print(f'Изображения сохранены в: {IMAGES}')

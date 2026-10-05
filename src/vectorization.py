@@ -1,4 +1,4 @@
-﻿from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
 
 def fit_transform_train_test(train_texts, test_texts):
