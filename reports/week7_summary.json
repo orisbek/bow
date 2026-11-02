@@ -1,0 +1,14 @@
+{
+  "model": "prajjwal1/bert-tiny",
+  "sample_size": 20,
+  "ham": 10,
+  "spam": 10,
+  "focus_rows": [
+    2,
+    75
+  ],
+  "tfidf_document_cosine": 0.05073337377337026,
+  "bert_document_cosine": 0.7075782418251038,
+  "bert_free_token_cosine": 0.6257996559143066,
+  "attention_note": "Final-layer attention averaged across heads; attention is not a causal explanation."
+}
