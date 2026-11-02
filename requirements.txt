@@ -6,7 +6,7 @@ nltk>=3.8
 spacy>=3.7
 jupyter>=1.0
 wordcloud>=1.9
-gensim>=4.3
+gensim==4.4.0
 scipy>=1.10
 torch>=2.6,<3
 transformers>=4.45,<5

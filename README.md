@@ -82,20 +82,24 @@ PCA
 
 ## Установка
 
+Для полного запуска проекта используйте **64-битный Python 3.12 или 3.13**. Для `gensim 4.4.0` есть готовые Windows x64 пакеты под эти версии; под Python 3.14 готового Windows x64 пакета нет, и `pip` пытается собрать `gensim` из исходников. В командной строке Windows проверьте установленные версии командой `py -0p`.
+
+Windows (PowerShell, пример с Python 3.13):
+
+```powershell
+py -3.13 -m venv .venv
+.venv\Scripts\python.exe -m pip install --upgrade pip
+.venv\Scripts\python.exe -m pip install --only-binary=gensim -r requirements.txt
+```
+
+Ключ `--only-binary=gensim` не позволяет незаметно перейти к сборке `gensim` из исходников: если подходящего пакета нет, установка сразу сообщит об этом. При наличии Python 3.12 замените `-3.13` на `-3.12`. Если команда `py -3.13` не найдена, установите 64-битный Python 3.13 и затем повторите команды. Все команды запуска проекта выполняйте через `.venv\Scripts\python.exe` либо активируйте это окружение.
+
+Linux/macOS:
+
 ```bash
 python -m venv .venv
-```
-
-Windows:
-
-```bash
-.venv\\Scripts\\activate
-```
-
-Установка зависимостей:
-
-```bash
-pip install -r requirements.txt
+./.venv/bin/python -m pip install --upgrade pip
+./.venv/bin/python -m pip install -r requirements.txt
 ```
 
 ## Запуск Week 6
