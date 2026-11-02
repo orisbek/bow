@@ -1,0 +1,15 @@
+{
+  "encoder": "prajjwal1/bert-tiny",
+  "revision": "6f75de8b60a9f8a2fdf7b69cbd86d9e64bcb3837",
+  "max_length": 96,
+  "pooling": "attention-mask mean of final hidden states, including CLS/SEP",
+  "encoder_updated": false,
+  "trainable_head": "balanced LogisticRegression",
+  "split": {
+    "test_size": 0.2,
+    "stratified": true,
+    "seed": 42
+  },
+  "positive_class": "spam",
+  "threshold": 0.5
+}

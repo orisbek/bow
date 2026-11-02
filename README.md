@@ -123,3 +123,7 @@ python scripts/predict_sms.py "Congratulations! You won a free cash prize. Call 
 ## Неделя 7 — Transformer / Attention
 
 `python -m scripts.week7_transformer_attention` анализирует 20 исходных SMS (по 10 каждого класса), сохраняет контекстные векторы BERT, сравнение с TF-IDF и веса attention для слова `free` в двух контекстах. Notebook: `notebooks/07_transformer_attention.ipynb`. Фактические результаты и ограничения: `reports/week7_conclusions.md`, данные: `reports/week7_*.csv` и `reports/week7_summary.json`. Входной корпус английский; используется `prajjwal1/bert-tiny` с закреплённой ревизией. Веса скачиваются при первом запуске.
+
+## Неделя 8 — BERT без дообучения encoder
+
+`python -m scripts.week8_bert_features` вычисляет mean-pooled признаки замороженного BERT на SMS, обучает линейный классификатор и сравнивает с TF-IDF + Logistic Regression на том же стратифицированном split. Результаты: `reports/week8_comparison.csv`, `reports/week8_predictions.csv`, `reports/week8_conclusions.md`. Notebook: `notebooks/08_bert_features.ipynb`. Линейная голова обучается с метками, поэтому этот этап называется feature extraction, не zero-shot. Для воспроизведения требуется скачать BERT-веса при первом запуске.
