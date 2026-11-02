@@ -1,0 +1,15 @@
+{
+  "encoder": "prajjwal1/bert-tiny",
+  "revision": "6f75de8b60a9f8a2fdf7b69cbd86d9e64bcb3837",
+  "initialized_head": "week8_frozen_bert_logreg.joblib",
+  "max_length": 96,
+  "batch_size": 32,
+  "epochs": 2,
+  "learning_rate": 2e-05,
+  "optimizer": "AdamW",
+  "loss": "BCEWithLogitsLoss with train-derived positive class weight",
+  "seed": 42,
+  "test_size": 0.2,
+  "stratified": true,
+  "selection": "fixed hyperparameters; test evaluated before and after, never used for training"
+}

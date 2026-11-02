@@ -1,4 +1,4 @@
-# Spam Detector — учебный NLP-проект (недели 1–6)
+# Spam Detector — учебный NLP-проект (недели 1–9)
 
 Проект работает **только с исходным датасетом `data/SMSSpamCollection`** и постепенно проходит путь от EDA и preprocessing до векторных представлений и прикладной классификации SMS.
 
@@ -127,3 +127,7 @@ python scripts/predict_sms.py "Congratulations! You won a free cash prize. Call 
 ## Неделя 8 — BERT без дообучения encoder
 
 `python -m scripts.week8_bert_features` вычисляет mean-pooled признаки замороженного BERT на SMS, обучает линейный классификатор и сравнивает с TF-IDF + Logistic Regression на том же стратифицированном split. Результаты: `reports/week8_comparison.csv`, `reports/week8_predictions.csv`, `reports/week8_conclusions.md`. Notebook: `notebooks/08_bert_features.ipynb`. Линейная голова обучается с метками, поэтому этот этап называется feature extraction, не zero-shot. Для воспроизведения требуется скачать BERT-веса при первом запуске.
+
+## Неделя 9 — Fine-tuning BERT
+
+`python -m scripts.week9_bert_finetune` инициализирует линейную голову из недели 8 и дообучает вместе с ней весь encoder две эпохи на том же train split. Сравнение до/после на фиксированном test: `reports/week9_before_after.csv`, индивидуальные результаты: `reports/week9_predictions.csv`, выводы: `reports/week9_conclusions.md`; notebook: `notebooks/09_bert_finetune.ipynb`. Перед запуском недели 9 модель недели 8 создаётся автоматически при отсутствии её файла. Чекпойнт сохраняется в `models/week9_finetuned_bert.pt`.
