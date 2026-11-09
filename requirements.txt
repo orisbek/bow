@@ -10,3 +10,4 @@ gensim==4.4.0
 scipy>=1.10
 torch>=2.6,<3
 transformers>=4.45,<5
+tabulate>=0.9
