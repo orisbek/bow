@@ -1,0 +1,68 @@
+{
+  "model": "prajjwal1/bert-tiny",
+  "revision": "6f75de8b60a9f8a2fdf7b69cbd86d9e64bcb3837",
+  "seed": 42,
+  "epochs": 2,
+  "batch_size": 32,
+  "max_length": 96,
+  "optimizer": "AdamW",
+  "weight_decay": 0.01,
+  "threshold": 0.5,
+  "initialization": "Original pretrained BERT; LogisticRegression fitted ONLY on current train subset",
+  "selection": "Five prespecified configurations; no test-based tuning or early stopping",
+  "dataset_sha256": "7d039a24a6083ed9ef0f806ebad56bbb976e3aeb8de05669173bfdc4996c239d",
+  "checkpoint_sha256": "d2c6338b3edd979b2243f91765294de9122afa74d560aef4e47a1643b24a0b3b",
+  "python": "3.12.10",
+  "versions": {
+    "torch": "2.15.0",
+    "transformers": "4.57.6",
+    "numpy": "2.5.4",
+    "pandas": "3.1.0",
+    "scikit-learn": "1.9.1",
+    "matplotlib": "3.11.2"
+  },
+  "device": "cpu",
+  "threads": 4,
+  "started_utc": "2026-11-09T11:48:46.001098+00:00",
+  "experiments": [
+    [
+      "lr_1e-5_full",
+      1e-05,
+      1.0
+    ],
+    [
+      "lr_2e-5_full",
+      2e-05,
+      1.0
+    ],
+    [
+      "lr_5e-5_full",
+      5e-05,
+      1.0
+    ],
+    [
+      "data_50",
+      2e-05,
+      0.5
+    ],
+    [
+      "data_75",
+      2e-05,
+      0.75
+    ]
+  ],
+  "audit": {
+    "rows": 5572,
+    "ham": 4825,
+    "spam": 747,
+    "train_rows": 4457,
+    "test_rows": 1115,
+    "test_ham": 966,
+    "duplicate_excess": 403,
+    "shared_unique_messages": 115,
+    "test_rows_overlapping_train": 128,
+    "clean_test_rows": 987
+  },
+  "reference_max_probability_difference": 1.5476638031142187e-06,
+  "finished_utc": "2026-11-09T11:53:07.290475+00:00"
+}
