@@ -41,7 +41,7 @@ regex==2026.11.15
 requests==2.34.2
 rpds-py==2026.9.1
 safetensors==0.8.0
-scikit-learn==1.9.1
+scikit-learn==1.8.0
 scipy==1.18.1
 setuptools==84.2.1
 starlette==1.10.0

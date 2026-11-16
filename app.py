@@ -60,14 +60,14 @@ st.caption("АНАЛИЗ ТЕКСТА / КЛАССИФИКАЦИЯ SMS")
 st.title("Это спам или обычное сообщение?")
 st.write("Введите SMS на английском языке. Модель определит класс и покажет вероятности.")
 
-left, right = st.columns([1.05, 1], gap="large")
+left, right = st.columns([1.05, 1], gap="small")
 with left:
     st.subheader("Сообщение")
     st.selectbox("Контрольный пример", ["Свой текст"] +
                  [f'{item["id"]} · {item["title"]}' for item in CONTROL_TEXTS],
                  key="example", on_change=select_example)
     with st.form("sms_form"):
-        text = st.text_area("Текст SMS", key="sms", height=180, max_chars=4000,
+        text = st.text_area("Текст SMS", key="sms", height=140, max_chars=4000,
                             placeholder="Hey, are we still meeting at the library at six?")
         submitted = st.form_submit_button("Анализировать", type="primary", use_container_width=True)
     st.caption("До 4 000 символов. Модель использует первые 96 токенов, включая служебные.")
