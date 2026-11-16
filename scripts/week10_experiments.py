@@ -119,7 +119,8 @@ def scored(name, y, prob, train_size, clean_mask):
     return row
 
 
-def run_training(name, lr, ids, labels, df, features, tokenizer, model_path, test_loader):
+def run_training(name, lr, ids, labels, df, features, tokenizer, model_path, test_loader,
+                 checkpoint_path=None):
     torch.manual_seed(SEED)
     np.random.seed(SEED)
     head = LogisticRegression(max_iter=1000, class_weight='balanced', random_state=SEED)
@@ -148,6 +149,10 @@ def run_training(name, lr, ids, labels, df, features, tokenizer, model_path, tes
         print(json.dumps(history[-1]), flush=True)
     # No checkpoint or parameter selection on test: one evaluation after fixed epochs.
     probability = predict(classifier, test_loader)
+    if checkpoint_path is not None:
+        checkpoint_path = Path(checkpoint_path)
+        checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+        torch.save(classifier.state_dict(), checkpoint_path)
     return probability, history
 
 

@@ -26,6 +26,19 @@ outputs/
 # Reports
 reports/
 
+# Assignment Week 5 deliverables (repository stage Week 11).
+!models/
+models/*
+!models/week11_best_bert/
+!reports/
+reports/*
+!reports/week11_*
+!outputs/
+outputs/*
+!outputs/images/
+outputs/images/*
+!outputs/images/week11_app/
+
 # OS / IDE
 .DS_Store
 .vscode/
