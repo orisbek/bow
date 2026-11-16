@@ -1,0 +1,69 @@
+{
+  "assignment_week": 5,
+  "repository_stage": 11,
+  "experiment": "lr_5e-5_full",
+  "model": "prajjwal1/bert-tiny",
+  "revision": "6f75de8b60a9f8a2fdf7b69cbd86d9e64bcb3837",
+  "learning_rate": 5e-05,
+  "epochs": 2,
+  "batch_size": 32,
+  "max_length": 96,
+  "seed": 42,
+  "threshold": 0.5,
+  "train_size": 4457,
+  "test_size": 1115,
+  "recorded_metrics": {
+    "accuracy": 0.9883408071748879,
+    "precision_spam": 0.9533333333333334,
+    "recall_spam": 0.959731543624161,
+    "f1_spam": 0.9565217391304348
+  },
+  "reproduced_metrics": {
+    "model": "lr_5e-5_full",
+    "train_size": 4457,
+    "test_size": 1115,
+    "accuracy": 0.9883408071748879,
+    "precision_spam": 0.9533333333333334,
+    "recall_spam": 0.959731543624161,
+    "f1_spam": 0.9565217391304348,
+    "roc_auc": 0.996915252824211,
+    "tn": 959,
+    "fp": 7,
+    "fn": 6,
+    "tp": 143,
+    "clean_test_size": 987,
+    "clean_accuracy": 0.9878419452887538,
+    "clean_precision_spam": 0.9495798319327731,
+    "clean_recall_spam": 0.9495798319327731,
+    "clean_f1_spam": 0.9495798319327731,
+    "clean_roc_auc": 0.9963888781318979
+  },
+  "matching_test_predictions": 1115,
+  "max_probability_difference": 0.015552040141983026,
+  "dataset_sha256": "7d039a24a6083ed9ef0f806ebad56bbb976e3aeb8de05669173bfdc4996c239d",
+  "dataset_file_sha256": "55341228082b25b832a5868a5ab4b038142a57f70c676c123280af6ff457fe46",
+  "dataset_hash_normalization": "CRLF to LF for cross-platform Git checkouts",
+  "selection_csv_sha256": "999395132a4d097e0b37a70688ee9a053ab4094171cec2ddd8e8a7c0b30c8387",
+  "checkpoint_sha256": "0cfa7e8e44fece8bc26acca5947cc4d85771257d85397f07fcb75461c7187299",
+  "history": [
+    {
+      "experiment": "lr_5e-5_full",
+      "epoch": 1,
+      "train_loss": 0.19009749941472467
+    },
+    {
+      "experiment": "lr_5e-5_full",
+      "epoch": 2,
+      "train_loss": 0.12379415561505529
+    }
+  ],
+  "python": "3.14.7",
+  "versions": {
+    "torch": "2.15.0",
+    "transformers": "4.57.6",
+    "numpy": "2.5.2",
+    "pandas": "3.1.0",
+    "scikit-learn": "1.8.0",
+    "streamlit": "1.67.0"
+  }
+}
